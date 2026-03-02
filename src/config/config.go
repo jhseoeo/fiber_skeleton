@@ -3,6 +3,8 @@ package config
 import (
 	"os"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -14,6 +16,9 @@ type Config struct {
 }
 
 func Load() *Config {
+	// .env is optional; ignore error when file is absent.
+	_ = godotenv.Load()
+
 	return &Config{
 		Port:           getEnv("PORT", "3000"),
 		Env:            getEnv("ENV", "development"),
