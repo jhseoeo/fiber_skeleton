@@ -4,8 +4,8 @@ import "github.com/jhseoeo/fiber-skeleton/src/dto/errorcode"
 
 type CommonResp struct {
 	Code    errorcode.ErrorCode `json:"code"`
-	Message string              `json:"message"`
-	Data    any                 `json:"data"`
+	Message string              `json:"message,omitempty"`
+	Data    any                 `json:"data,omitempty"`
 }
 
 type PaginatedResp struct {
