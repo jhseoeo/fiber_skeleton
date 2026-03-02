@@ -15,32 +15,12 @@ import (
 	"github.com/jhseoeo/fiber-skeleton/src/middleware"
 	"github.com/jhseoeo/fiber-skeleton/src/model"
 	repositoryerror "github.com/jhseoeo/fiber-skeleton/src/repository/error"
+	"github.com/jhseoeo/fiber-skeleton/src/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-// mockExampleService is a manual mock of ExampleServicePort.
-type mockExampleService struct {
-	getExample    func(ctx context.Context, id uint) (*model.Example, error)
-	createExample func(ctx context.Context, example *model.Example) error
-	updateExample func(ctx context.Context, example *model.Example) error
-	deleteExample func(ctx context.Context, id uint) error
-}
-
-func (m *mockExampleService) GetExample(ctx context.Context, id uint) (*model.Example, error) {
-	return m.getExample(ctx, id)
-}
-func (m *mockExampleService) CreateExample(ctx context.Context, example *model.Example) error {
-	return m.createExample(ctx, example)
-}
-func (m *mockExampleService) UpdateExample(ctx context.Context, example *model.Example) error {
-	return m.updateExample(ctx, example)
-}
-func (m *mockExampleService) DeleteExample(ctx context.Context, id uint) error {
-	return m.deleteExample(ctx, id)
-}
-
-func newTestApp(svc *mockExampleService) *fiber.App {
+func newTestApp(svc *testutil.MockExampleService) *fiber.App {
 	app := fiber.New(fiber.Config{ErrorHandler: middleware.NewErrorHandler()})
 	h := handler.NewExampleHandler(svc)
 	h.RegisterRoutes(app)
@@ -57,8 +37,8 @@ func decodeResp(t *testing.T, body *bytes.Buffer) resp.CommonResp {
 // --- GET /example/:id ---
 
 func TestGetExample_Success(t *testing.T) {
-	app := newTestApp(&mockExampleService{
-		getExample: func(_ context.Context, id uint) (*model.Example, error) {
+	app := newTestApp(&testutil.MockExampleService{
+		GetExampleFn: func(_ context.Context, id uint) (*model.Example, error) {
 			return &model.Example{ID: id, Content: "hello"}, nil
 		},
 	})
@@ -76,7 +56,7 @@ func TestGetExample_Success(t *testing.T) {
 }
 
 func TestGetExample_InvalidID(t *testing.T) {
-	app := newTestApp(&mockExampleService{})
+	app := newTestApp(&testutil.MockExampleService{})
 
 	req := httptest.NewRequest(http.MethodGet, "/example/abc", nil)
 	res, err := app.Test(req)
@@ -86,8 +66,8 @@ func TestGetExample_InvalidID(t *testing.T) {
 }
 
 func TestGetExample_NotFound(t *testing.T) {
-	app := newTestApp(&mockExampleService{
-		getExample: func(_ context.Context, id uint) (*model.Example, error) {
+	app := newTestApp(&testutil.MockExampleService{
+		GetExampleFn: func(_ context.Context, id uint) (*model.Example, error) {
 			return nil, repositoryerror.ErrNotFound.New("example 1")
 		},
 	})
@@ -102,8 +82,8 @@ func TestGetExample_NotFound(t *testing.T) {
 // --- POST /example ---
 
 func TestCreateExample_Success(t *testing.T) {
-	app := newTestApp(&mockExampleService{
-		createExample: func(_ context.Context, example *model.Example) error {
+	app := newTestApp(&testutil.MockExampleService{
+		CreateExampleFn: func(_ context.Context, example *model.Example) error {
 			example.ID = 1
 			return nil
 		},
@@ -119,7 +99,7 @@ func TestCreateExample_Success(t *testing.T) {
 }
 
 func TestCreateExample_InvalidBody(t *testing.T) {
-	app := newTestApp(&mockExampleService{})
+	app := newTestApp(&testutil.MockExampleService{})
 
 	req := httptest.NewRequest(http.MethodPost, "/example", bytes.NewBufferString(`{"content":""}`))
 	req.Header.Set("Content-Type", "application/json")
@@ -132,8 +112,8 @@ func TestCreateExample_InvalidBody(t *testing.T) {
 // --- PUT /example/:id ---
 
 func TestUpdateExample_Success(t *testing.T) {
-	app := newTestApp(&mockExampleService{
-		updateExample: func(_ context.Context, example *model.Example) error {
+	app := newTestApp(&testutil.MockExampleService{
+		UpdateExampleFn: func(_ context.Context, example *model.Example) error {
 			return nil
 		},
 	})
@@ -148,8 +128,8 @@ func TestUpdateExample_Success(t *testing.T) {
 }
 
 func TestUpdateExample_NotFound(t *testing.T) {
-	app := newTestApp(&mockExampleService{
-		updateExample: func(_ context.Context, example *model.Example) error {
+	app := newTestApp(&testutil.MockExampleService{
+		UpdateExampleFn: func(_ context.Context, example *model.Example) error {
 			return repositoryerror.ErrNotFound.New("example 1")
 		},
 	})
@@ -166,8 +146,8 @@ func TestUpdateExample_NotFound(t *testing.T) {
 // --- DELETE /example/:id ---
 
 func TestDeleteExample_Success(t *testing.T) {
-	app := newTestApp(&mockExampleService{
-		deleteExample: func(_ context.Context, id uint) error {
+	app := newTestApp(&testutil.MockExampleService{
+		DeleteExampleFn: func(_ context.Context, id uint) error {
 			return nil
 		},
 	})
@@ -180,8 +160,8 @@ func TestDeleteExample_Success(t *testing.T) {
 }
 
 func TestDeleteExample_NotFound(t *testing.T) {
-	app := newTestApp(&mockExampleService{
-		deleteExample: func(_ context.Context, id uint) error {
+	app := newTestApp(&testutil.MockExampleService{
+		DeleteExampleFn: func(_ context.Context, id uint) error {
 			return repositoryerror.ErrNotFound.New("example 1")
 		},
 	})
