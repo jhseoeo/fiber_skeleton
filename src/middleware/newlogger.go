@@ -1,32 +1,35 @@
 package middleware
 
 import (
-	"io"
+	"time"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/gofiber/fiber/v3/middleware/logger"
 	"github.com/jhseoeo/fiber-skeleton/src/pkg/log"
 	"github.com/sirupsen/logrus"
 )
 
 func NewLogger() fiber.Handler {
-	return logger.New(logger.Config{
-		Stream: io.Discard,
-		Done: func(c fiber.Ctx, _ []byte) {
-			if c.Path() == "/health" {
-				// do nothing
-				return
-			}
-			status := c.Response().StatusCode()
-			// if an error occurred, do nothing. it will be handled by the error handler
-			if 400 <= status && status <= 599 {
-				return
-			}
+	return func(c fiber.Ctx) error {
+		start := time.Now()
+		err := c.Next()
 
-			log.NewFiberLogEntry(c).WithFields(logrus.Fields{
-				"status": status,
-			}).Info("request")
+		if c.Path() == "/health" {
+			return err
+		}
 
-		},
-	})
+		status := c.Response().StatusCode()
+		// if an error occurred, do nothing. it will be handled by the error handler
+		if 400 <= status && status <= 599 {
+			return err
+		}
+
+		log.NewFiberLogEntry(c).WithFields(logrus.Fields{
+			"status":     status,
+			"latency_ms": time.Since(start).Milliseconds(),
+			"bytes_sent": len(c.Response().Body()),
+			"ip":         c.IP(),
+		}).Info("request")
+
+		return err
+	}
 }
