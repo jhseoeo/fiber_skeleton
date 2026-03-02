@@ -1,0 +1,36 @@
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - gofmt
+    - goimports
+    - misspell
+    - bodyclose
+    - noctx
+    - revive
+    - godot
+
+linters-settings:
+  goimports:
+    local-prefixes: github.com/jhseoeo/fiber-skeleton
+  revive:
+    rules:
+      - name: exported
+        disabled: true
+  godot:
+    scope: declarations
+    capital: false
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
+        - bodyclose
