@@ -16,6 +16,15 @@ func NewErrorHandler() fiber.ErrorHandler {
 		var fiberError *fiber.Error
 		if errors.As(err, &fiberError) {
 			code := errorcode.ErrorCode(fiberError.Code * 100)
+			entry := log.NewFiberLogEntry(c).WithFields(logrus.Fields{
+				"status":  fiberError.Code,
+				"message": fiberError.Message,
+			})
+			if fiberError.Code >= 500 {
+				entry.Errorln(fiberError.Message)
+			} else {
+				entry.Infoln(fiberError.Message)
+			}
 			return c.Status(fiberError.Code).JSON(resp.CommonResp{
 				Code:    code,
 				Message: fiberError.Message,
@@ -27,28 +36,31 @@ func NewErrorHandler() fiber.ErrorHandler {
 			status = fiber.StatusInternalServerError
 			code   = errorcode.ErrInternalServer
 			inner  error
+			msg    string
 		)
 		if errors.As(err, &e) {
 			status = e.Code.HTTPStatus()
 			code = e.Code
 			inner = e.Err
+			msg = e.Message
 		} else {
 			inner = err
+			msg = "internal server error"
 		}
 
 		entry := log.NewFiberLogEntry(c).WithFields(logrus.Fields{
 			"status":  status,
-			"message": e.Message,
+			"message": msg,
 		}).WithError(inner)
 		if status >= 500 {
-			entry.Errorln(e.Message)
+			entry.Errorln(msg)
 		} else {
-			entry.Infoln(e.Message)
+			entry.Infoln(msg)
 		}
 
 		return c.Status(status).JSON(resp.CommonResp{
 			Code:    code,
-			Message: e.Message,
+			Message: msg,
 		})
 	}
 }
