@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/jhseoeo/fiber-skeleton/src/dto/errorcode"
@@ -19,6 +20,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+const testTimeout = 5 * time.Second
 
 func newTestApp(svc *testutil.MockExampleService) *fiber.App {
 	app := fiber.New(fiber.Config{ErrorHandler: middleware.NewErrorHandler()})
@@ -44,7 +47,7 @@ func TestGetExample_Success(t *testing.T) {
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/example/1", nil)
-	res, err := app.Test(req)
+	res, err := app.Test(req, fiber.TestConfig{Timeout: testTimeout})
 	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
@@ -59,7 +62,7 @@ func TestGetExample_InvalidID(t *testing.T) {
 	app := newTestApp(&testutil.MockExampleService{})
 
 	req := httptest.NewRequest(http.MethodGet, "/example/abc", nil)
-	res, err := app.Test(req)
+	res, err := app.Test(req, fiber.TestConfig{Timeout: testTimeout})
 	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
@@ -73,7 +76,7 @@ func TestGetExample_NotFound(t *testing.T) {
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/example/99", nil)
-	res, err := app.Test(req)
+	res, err := app.Test(req, fiber.TestConfig{Timeout: testTimeout})
 	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
@@ -92,7 +95,7 @@ func TestCreateExample_Success(t *testing.T) {
 	body, _ := json.Marshal(map[string]string{"content": "hello"})
 	req := httptest.NewRequest(http.MethodPost, "/example", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	res, err := app.Test(req)
+	res, err := app.Test(req, fiber.TestConfig{Timeout: testTimeout})
 	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusCreated, res.StatusCode)
@@ -103,7 +106,7 @@ func TestCreateExample_InvalidBody(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/example", bytes.NewBufferString(`{"content":""}`))
 	req.Header.Set("Content-Type", "application/json")
-	res, err := app.Test(req)
+	res, err := app.Test(req, fiber.TestConfig{Timeout: testTimeout})
 	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
@@ -121,7 +124,7 @@ func TestUpdateExample_Success(t *testing.T) {
 	body, _ := json.Marshal(map[string]string{"content": "updated"})
 	req := httptest.NewRequest(http.MethodPut, "/example/1", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	res, err := app.Test(req)
+	res, err := app.Test(req, fiber.TestConfig{Timeout: testTimeout})
 	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
@@ -137,7 +140,7 @@ func TestUpdateExample_NotFound(t *testing.T) {
 	body, _ := json.Marshal(map[string]string{"content": "updated"})
 	req := httptest.NewRequest(http.MethodPut, "/example/1", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	res, err := app.Test(req)
+	res, err := app.Test(req, fiber.TestConfig{Timeout: testTimeout})
 	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
@@ -153,7 +156,7 @@ func TestDeleteExample_Success(t *testing.T) {
 	})
 
 	req := httptest.NewRequest(http.MethodDelete, "/example/1", nil)
-	res, err := app.Test(req)
+	res, err := app.Test(req, fiber.TestConfig{Timeout: testTimeout})
 	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusNoContent, res.StatusCode)
@@ -167,7 +170,7 @@ func TestDeleteExample_NotFound(t *testing.T) {
 	})
 
 	req := httptest.NewRequest(http.MethodDelete, "/example/99", nil)
-	res, err := app.Test(req)
+	res, err := app.Test(req, fiber.TestConfig{Timeout: testTimeout})
 	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
