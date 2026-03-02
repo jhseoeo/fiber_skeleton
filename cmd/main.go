@@ -34,6 +34,7 @@ func main() {
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: middleware.NewErrorHandler(),
+		BodyLimit:    4 * 1024 * 1024, // 4 MB
 	})
 
 	app.Use(middleware.NewRecoverer())
