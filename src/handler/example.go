@@ -10,6 +10,7 @@ import (
 	"github.com/jhseoeo/fiber-skeleton/src/dto/resp"
 	"github.com/jhseoeo/fiber-skeleton/src/model"
 	"github.com/jhseoeo/fiber-skeleton/src/pkg/typeerr"
+	"github.com/jhseoeo/fiber-skeleton/src/pkg/validate"
 	repositoryerror "github.com/jhseoeo/fiber-skeleton/src/repository/error"
 	"github.com/jhseoeo/fiber-skeleton/src/service/serviceport"
 )
@@ -31,6 +32,18 @@ func (h *ExampleHandler) RegisterRoutes(router fiber.Router) {
 	router.Delete("/example/:id", h.delete)
 }
 
+// get godoc
+//
+//	@Summary		Get example
+//	@Description	Get an example item by ID
+//	@Tags			example
+//	@Produce		json
+//	@Param			id	path		int				true	"Example ID"
+//	@Success		200	{object}	resp.CommonResp	"ok"
+//	@Failure		400	{object}	resp.CommonResp	"invalid id"
+//	@Failure		404	{object}	resp.CommonResp	"not found"
+//	@Failure		500	{object}	resp.CommonResp	"internal error"
+//	@Router			/example/{id} [get]
 func (h *ExampleHandler) get(c fiber.Ctx) error {
 	idUint, err := parseID(c)
 	if err != nil {
@@ -52,10 +65,26 @@ func (h *ExampleHandler) get(c fiber.Ctx) error {
 	})
 }
 
+// create godoc
+//
+//	@Summary		Create example
+//	@Description	Create a new example item
+//	@Tags			example
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		req.CreateExampleReq	true	"Request body"
+//	@Success		201		{object}	resp.CommonResp			"created"
+//	@Failure		400		{object}	resp.CommonResp			"invalid body"
+//	@Failure		409		{object}	resp.CommonResp			"already exists"
+//	@Failure		500		{object}	resp.CommonResp			"internal error"
+//	@Router			/example [post]
 func (h *ExampleHandler) create(c fiber.Ctx) error {
 	var body req.CreateExampleReq
 	if err := c.Bind().JSON(&body); err != nil {
 		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, "invalid request body")
+	}
+	if err := validate.Struct(&body); err != nil {
+		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, err.Error())
 	}
 	example := &model.Example{Content: body.Content}
 	if err := h.exampleService.CreateExample(c.Context(), example); err != nil {
@@ -72,6 +101,20 @@ func (h *ExampleHandler) create(c fiber.Ctx) error {
 	})
 }
 
+// update godoc
+//
+//	@Summary		Update example
+//	@Description	Update an existing example item by ID
+//	@Tags			example
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int						true	"Example ID"
+//	@Param			body	body		req.UpdateExampleReq	true	"Request body"
+//	@Success		200		{object}	resp.CommonResp			"ok"
+//	@Failure		400		{object}	resp.CommonResp			"invalid id or body"
+//	@Failure		404		{object}	resp.CommonResp			"not found"
+//	@Failure		500		{object}	resp.CommonResp			"internal error"
+//	@Router			/example/{id} [put]
 func (h *ExampleHandler) update(c fiber.Ctx) error {
 	idUint, err := parseID(c)
 	if err != nil {
@@ -80,6 +123,9 @@ func (h *ExampleHandler) update(c fiber.Ctx) error {
 	var body req.UpdateExampleReq
 	if err := c.Bind().JSON(&body); err != nil {
 		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, "invalid request body")
+	}
+	if err := validate.Struct(&body); err != nil {
+		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, err.Error())
 	}
 	example := &model.Example{ID: idUint, Content: body.Content}
 	if err := h.exampleService.UpdateExample(c.Context(), example); err != nil {
@@ -97,6 +143,18 @@ func (h *ExampleHandler) update(c fiber.Ctx) error {
 	})
 }
 
+// delete godoc
+//
+//	@Summary		Delete example
+//	@Description	Delete an example item by ID
+//	@Tags			example
+//	@Produce		json
+//	@Param			id	path		int				true	"Example ID"
+//	@Success		204	"no content"
+//	@Failure		400	{object}	resp.CommonResp	"invalid id"
+//	@Failure		404	{object}	resp.CommonResp	"not found"
+//	@Failure		500	{object}	resp.CommonResp	"internal error"
+//	@Router			/example/{id} [delete]
 func (h *ExampleHandler) delete(c fiber.Ctx) error {
 	idUint, err := parseID(c)
 	if err != nil {
