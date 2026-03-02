@@ -6,6 +6,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"sort"
 	"sync"
 
 	"github.com/jhseoeo/fiber-skeleton/src/model"
@@ -32,11 +33,14 @@ func (r *ExampleRepository) List(_ context.Context, offset, limit int) ([]*model
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	all := make([]*model.Example, 0, len(r.examples))
-	for _, e := range r.examples {
-		all = append(all, e)
+	// Collect IDs and sort for stable pagination order.
+	ids := make([]uint, 0, len(r.examples))
+	for id := range r.examples {
+		ids = append(ids, id)
 	}
-	total := len(all)
+	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+
+	total := len(ids)
 	if offset >= total {
 		return []*model.Example{}, total, nil
 	}
@@ -44,7 +48,15 @@ func (r *ExampleRepository) List(_ context.Context, offset, limit int) ([]*model
 	if end > total {
 		end = total
 	}
-	return all[offset:end], total, nil
+
+	// Return value copies to avoid shared-pointer races after the lock is released.
+	page := ids[offset:end]
+	result := make([]*model.Example, len(page))
+	for i, id := range page {
+		cp := *r.examples[id]
+		result[i] = &cp
+	}
+	return result, total, nil
 }
 
 func (r *ExampleRepository) FindByID(ctx context.Context, id uint) (*model.Example, error) {
