@@ -62,6 +62,11 @@ func main() {
 	//   api := app.Group("/api", middleware.NewAuthMiddleware([]byte(cfg.JWTSecret)))
 	//   exampleHandler.RegisterRoutes(api)
 
+	// TODO: apply rate limiting to specific route groups, e.g.:
+	//   import "github.com/gofiber/fiber/v3/middleware/limiter"
+	//   api := app.Group("/api", middleware.NewRateLimiter(limiter.Config{Max: 100, Expiration: time.Minute}))
+	//   exampleHandler.RegisterRoutes(api)
+
 	quit := make(chan struct{})
 	go func() {
 		sig := make(chan os.Signal, 1)
