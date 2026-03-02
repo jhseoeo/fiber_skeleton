@@ -7,3 +7,10 @@ type CommonResp struct {
 	Message string              `json:"message"`
 	Data    any                 `json:"data"`
 }
+
+type PaginatedResp struct {
+	Total int `json:"total"`
+	Page  int `json:"page"`
+	Limit int `json:"limit"`
+	Data  any `json:"data"`
+}

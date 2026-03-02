@@ -12,8 +12,14 @@ const (
 	ErrInvalidID   ErrorCode = 40001
 	ErrInvalidBody ErrorCode = 40002
 
+	// 401xx - Unauthorized
+	ErrUnauthorized ErrorCode = 40100
+
 	// 404xx - Not Found
 	ErrNotFound ErrorCode = 40400
+
+	// 408xx - Request Timeout
+	ErrRequestTimeout ErrorCode = 40800
 
 	// 409xx - Conflict
 	ErrConflict ErrorCode = 40900
