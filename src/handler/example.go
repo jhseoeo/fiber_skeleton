@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/jhseoeo/fiber-skeleton/src/dto/errorcode"
 	"github.com/jhseoeo/fiber-skeleton/src/dto/req"
 	"github.com/jhseoeo/fiber-skeleton/src/dto/resp"
 	"github.com/jhseoeo/fiber-skeleton/src/model"
@@ -33,70 +34,79 @@ func (h *ExampleHandler) RegisterRoutes(router fiber.Router) {
 func (h *ExampleHandler) get(c fiber.Ctx) error {
 	idUint, err := parseID(c)
 	if err != nil {
-		return typeerr.NewErrorResp(err, fiber.StatusBadRequest, "invalid id")
+		return typeerr.NewErrorResp(err, errorcode.ErrInvalidID, "invalid id")
 	}
 	example, err := h.exampleService.GetExample(c.Context(), idUint)
 	if err != nil {
 		if errors.Is(err, repositoryerror.ErrNotFound) {
-			return typeerr.NewErrorResp(err, fiber.StatusNotFound, "example not found")
+			return typeerr.NewErrorResp(err, errorcode.ErrNotFound, "example not found")
 		}
-		return typeerr.NewErrorResp(err, fiber.StatusInternalServerError, "failed to get example")
+		return typeerr.NewErrorResp(err, errorcode.ErrInternalServer, "failed to get example")
 	}
-	return c.JSON(resp.GetExampleResp{
-		ID:      example.ID,
-		Content: example.Content,
+	return c.JSON(resp.CommonResp{
+		Code: errorcode.Success,
+		Data: resp.GetExampleResp{
+			ID:      example.ID,
+			Content: example.Content,
+		},
 	})
 }
 
 func (h *ExampleHandler) create(c fiber.Ctx) error {
 	var body req.CreateExampleReq
 	if err := c.Bind().JSON(&body); err != nil {
-		return typeerr.NewErrorResp(err, fiber.StatusBadRequest, "invalid request body")
+		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, "invalid request body")
 	}
 	example := &model.Example{Content: body.Content}
 	if err := h.exampleService.CreateExample(c.Context(), example); err != nil {
 		if errors.Is(err, repositoryerror.ErrAlreadyExists) {
-			return typeerr.NewErrorResp(err, fiber.StatusConflict, "example already exists")
+			return typeerr.NewErrorResp(err, errorcode.ErrConflict, "example already exists")
 		}
-		return typeerr.NewErrorResp(err, fiber.StatusInternalServerError, "failed to create example")
+		return typeerr.NewErrorResp(err, errorcode.ErrInternalServer, "failed to create example")
 	}
-	return c.Status(fiber.StatusCreated).JSON(resp.CreateExampleResp{
-		ID: example.ID,
+	return c.Status(fiber.StatusCreated).JSON(resp.CommonResp{
+		Code: errorcode.Success,
+		Data: resp.CreateExampleResp{
+			ID: example.ID,
+		},
 	})
 }
 
 func (h *ExampleHandler) update(c fiber.Ctx) error {
 	idUint, err := parseID(c)
 	if err != nil {
-		return typeerr.NewErrorResp(err, fiber.StatusBadRequest, "invalid id")
+		return typeerr.NewErrorResp(err, errorcode.ErrInvalidID, "invalid id")
 	}
 	var body req.UpdateExampleReq
 	if err := c.Bind().JSON(&body); err != nil {
-		return typeerr.NewErrorResp(err, fiber.StatusBadRequest, "invalid request body")
+		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, "invalid request body")
 	}
 	example := &model.Example{ID: idUint, Content: body.Content}
 	if err := h.exampleService.UpdateExample(c.Context(), example); err != nil {
 		if errors.Is(err, repositoryerror.ErrNotFound) {
-			return typeerr.NewErrorResp(err, fiber.StatusNotFound, "example not found")
+			return typeerr.NewErrorResp(err, errorcode.ErrNotFound, "example not found")
 		}
-		return typeerr.NewErrorResp(err, fiber.StatusInternalServerError, "failed to update example")
+		return typeerr.NewErrorResp(err, errorcode.ErrInternalServer, "failed to update example")
 	}
-	return c.JSON(resp.GetExampleResp{
-		ID:      example.ID,
-		Content: example.Content,
+	return c.JSON(resp.CommonResp{
+		Code: errorcode.Success,
+		Data: resp.GetExampleResp{
+			ID:      example.ID,
+			Content: example.Content,
+		},
 	})
 }
 
 func (h *ExampleHandler) delete(c fiber.Ctx) error {
 	idUint, err := parseID(c)
 	if err != nil {
-		return typeerr.NewErrorResp(err, fiber.StatusBadRequest, "invalid id")
+		return typeerr.NewErrorResp(err, errorcode.ErrInvalidID, "invalid id")
 	}
 	if err := h.exampleService.DeleteExample(c.Context(), idUint); err != nil {
 		if errors.Is(err, repositoryerror.ErrNotFound) {
-			return typeerr.NewErrorResp(err, fiber.StatusNotFound, "example not found")
+			return typeerr.NewErrorResp(err, errorcode.ErrNotFound, "example not found")
 		}
-		return typeerr.NewErrorResp(err, fiber.StatusInternalServerError, "failed to delete example")
+		return typeerr.NewErrorResp(err, errorcode.ErrInternalServer, "failed to delete example")
 	}
 	return c.SendStatus(fiber.StatusNoContent)
 }
