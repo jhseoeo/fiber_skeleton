@@ -13,7 +13,7 @@ func NewLogger() fiber.Handler {
 		start := time.Now()
 		err := c.Next()
 
-		if c.Path() == "/health" {
+		if c.Path() == "/health/live" || c.Path() == "/health/ready" {
 			return err
 		}
 

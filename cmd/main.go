@@ -50,7 +50,8 @@ func main() {
 		logrus.Info("pprof enabled at /debug/pprof")
 	}
 
-	app.Get("/health", handler.HealthCheck)
+	app.Get("/health/live", handler.Liveness)
+	app.Get("/health/ready", handler.Readiness)
 
 	// Swagger: GET /swagger/doc.json + minimal UI
 	registerSwagger(app)
