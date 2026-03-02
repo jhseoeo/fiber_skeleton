@@ -10,6 +10,7 @@ import (
 // Assign the function fields to control behaviour per test case.
 type MockExampleService struct {
 	GetExampleFn    func(ctx context.Context, id uint) (*model.Example, error)
+	ListExamplesFn  func(ctx context.Context, page, limit int) ([]*model.Example, int, error)
 	CreateExampleFn func(ctx context.Context, example *model.Example) error
 	UpdateExampleFn func(ctx context.Context, example *model.Example) error
 	DeleteExampleFn func(ctx context.Context, id uint) error
@@ -17,6 +18,10 @@ type MockExampleService struct {
 
 func (m *MockExampleService) GetExample(ctx context.Context, id uint) (*model.Example, error) {
 	return m.GetExampleFn(ctx, id)
+}
+
+func (m *MockExampleService) ListExamples(ctx context.Context, page, limit int) ([]*model.Example, int, error) {
+	return m.ListExamplesFn(ctx, page, limit)
 }
 
 func (m *MockExampleService) CreateExample(ctx context.Context, example *model.Example) error {

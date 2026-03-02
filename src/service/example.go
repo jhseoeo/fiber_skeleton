@@ -24,6 +24,11 @@ func (s *ExampleService) GetExample(ctx context.Context, id uint) (*model.Exampl
 	return s.exampleRepository.FindByID(ctx, id)
 }
 
+func (s *ExampleService) ListExamples(ctx context.Context, page, limit int) ([]*model.Example, int, error) {
+	offset := (page - 1) * limit
+	return s.exampleRepository.List(ctx, offset, limit)
+}
+
 func (s *ExampleService) CreateExample(ctx context.Context, example *model.Example) error {
 	return s.exampleRepository.Create(ctx, example)
 }

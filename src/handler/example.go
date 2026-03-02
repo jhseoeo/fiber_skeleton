@@ -26,10 +26,48 @@ func NewExampleHandler(exampleService serviceport.ExampleServicePort) *ExampleHa
 }
 
 func (h *ExampleHandler) RegisterRoutes(router fiber.Router) {
+	router.Get("/example", h.list)
 	router.Get("/example/:id", h.get)
 	router.Post("/example", h.create)
 	router.Put("/example/:id", h.update)
 	router.Delete("/example/:id", h.delete)
+}
+
+// list godoc
+//
+//	@Summary		List examples
+//	@Description	Returns a paginated list of example items
+//	@Tags			example
+//	@Produce		json
+//	@Param			page	query		int					true	"Page number (>=1)"
+//	@Param			limit	query		int					true	"Items per page (1-100)"
+//	@Success		200		{object}	resp.PaginatedResp	"ok"
+//	@Failure		400		{object}	resp.CommonResp		"invalid query"
+//	@Failure		500		{object}	resp.CommonResp		"internal error"
+//	@Router			/example [get]
+func (h *ExampleHandler) list(c fiber.Ctx) error {
+	var query req.PaginationReq
+	if err := c.Bind().Query(&query); err != nil {
+		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, "invalid query parameters")
+	}
+	if err := validate.Struct(&query); err != nil {
+		return typeerr.NewErrorRespWithData(err, errorcode.ErrInvalidBody, "validation failed", err)
+	}
+	examples, total, err := h.exampleService.ListExamples(c.Context(), query.Page, query.Limit)
+	if err != nil {
+		return typeerr.NewErrorResp(err, errorcode.ErrInternalServer, "failed to list examples")
+	}
+
+	items := make([]resp.GetExampleResp, 0, len(examples))
+	for _, e := range examples {
+		items = append(items, resp.GetExampleResp{ID: e.ID, Content: e.Content})
+	}
+	return c.JSON(resp.PaginatedResp{
+		Total: total,
+		Page:  query.Page,
+		Limit: query.Limit,
+		Data:  items,
+	})
 }
 
 // get godoc

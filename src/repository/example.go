@@ -28,6 +28,25 @@ func NewExampleRepository() *ExampleRepository {
 	}
 }
 
+func (r *ExampleRepository) List(_ context.Context, offset, limit int) ([]*model.Example, int, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	all := make([]*model.Example, 0, len(r.examples))
+	for _, e := range r.examples {
+		all = append(all, e)
+	}
+	total := len(all)
+	if offset >= total {
+		return []*model.Example{}, total, nil
+	}
+	end := offset + limit
+	if end > total {
+		end = total
+	}
+	return all[offset:end], total, nil
+}
+
 func (r *ExampleRepository) FindByID(ctx context.Context, id uint) (*model.Example, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
