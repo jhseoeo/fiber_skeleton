@@ -37,6 +37,7 @@ func main() {
 	})
 
 	app.Use(middleware.NewRecoverer())
+	app.Use(middleware.NewCORS())
 	app.Use(middleware.NewSecurity())
 	app.Use(middleware.NewTimeout(cfg.RequestTimeout))
 	app.Use(middleware.NewLogger())
