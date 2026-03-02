@@ -9,6 +9,7 @@ type ErrorResp struct {
 	Err     error
 	Code    errorcode.ErrorCode
 	Message string
+	Data    any
 }
 
 func NewErrorResp(err error, code errorcode.ErrorCode, message string) ErrorResp {
@@ -21,6 +22,13 @@ func NewErrorResp(err error, code errorcode.ErrorCode, message string) ErrorResp
 		Code:    code,
 		Message: message,
 	}
+}
+
+// NewErrorRespWithData is like NewErrorResp but attaches structured data to the response body.
+func NewErrorRespWithData(err error, code errorcode.ErrorCode, message string, data any) ErrorResp {
+	r := NewErrorResp(err, code, message)
+	r.Data = data
+	return r
 }
 
 func (e ErrorResp) Error() string {

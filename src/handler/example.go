@@ -84,7 +84,7 @@ func (h *ExampleHandler) create(c fiber.Ctx) error {
 		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, "invalid request body")
 	}
 	if err := validate.Struct(&body); err != nil {
-		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, err.Error())
+		return typeerr.NewErrorRespWithData(err, errorcode.ErrInvalidBody, "validation failed", err)
 	}
 	example := &model.Example{Content: body.Content}
 	if err := h.exampleService.CreateExample(c.Context(), example); err != nil {
@@ -125,7 +125,7 @@ func (h *ExampleHandler) update(c fiber.Ctx) error {
 		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, "invalid request body")
 	}
 	if err := validate.Struct(&body); err != nil {
-		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, err.Error())
+		return typeerr.NewErrorRespWithData(err, errorcode.ErrInvalidBody, "validation failed", err)
 	}
 	example := &model.Example{ID: idUint, Content: body.Content}
 	if err := h.exampleService.UpdateExample(c.Context(), example); err != nil {

@@ -37,12 +37,14 @@ func NewErrorHandler() fiber.ErrorHandler {
 			code   = errorcode.ErrInternalServer
 			inner  error
 			msg    string
+			data   any
 		)
 		if errors.As(err, &e) {
 			status = e.Code.HTTPStatus()
 			code = e.Code
 			inner = e.Err
 			msg = e.Message
+			data = e.Data
 		} else {
 			inner = err
 			msg = "internal server error"
@@ -61,6 +63,7 @@ func NewErrorHandler() fiber.ErrorHandler {
 		return c.Status(status).JSON(resp.CommonResp{
 			Code:    code,
 			Message: msg,
+			Data:    data,
 		})
 	}
 }
