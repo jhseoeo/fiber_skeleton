@@ -44,8 +44,8 @@ func main() {
 	app.Use(buildCORS(cfg))
 	app.Use(middleware.NewSecurity())
 	app.Use(middleware.NewTimeout(cfg.RequestTimeout))
-	app.Use(middleware.NewLogger())
 	app.Use(fiberrequestid.New())
+	app.Use(middleware.NewLogger())
 
 	// pprof: only expose in development
 	if cfg.Env == "development" {

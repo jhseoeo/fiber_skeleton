@@ -92,7 +92,7 @@ In handlers, use `typeerr.NewErrorRespWithData(err, code, message, err)` to incl
 `middleware.NewAuthMiddleware([]byte(secret))` validates `Authorization: Bearer <token>`. Access claims via `middleware.GetClaims(c)`. Routes are not protected by default — wrap route groups with the middleware when needed (see the TODO comment in `cmd/main.go`).
 
 ### Middleware stack order (cmd/main.go)
-`Recoverer → Metrics → CORS → Security (helmet) → Timeout → Logger → RequestID`
+`Recoverer → Metrics → CORS → Security (helmet) → Timeout → RequestID → Logger`
 - **Metrics** (`NewMetrics(app)`) also registers `GET /metrics` (Prometheus) on the app.
 - **CORS** (`NewCORS()`) defaults to allow-all; pass `cors.Config{AllowOrigins: ...}` in production.
 - **RateLimiter** (`NewRateLimiter(limiter.Config{...})`) is not wired by default — apply to specific route groups.
