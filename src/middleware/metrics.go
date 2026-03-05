@@ -37,7 +37,10 @@ func NewMetrics(app *fiber.App) fiber.Handler {
 
 		// Use the route pattern (e.g. /example/:id) instead of the actual path
 		// to avoid label cardinality explosion in Prometheus.
-		routePath := c.Route().Path
+		routePath := "unknown"
+		if r := c.Route(); r != nil {
+			routePath = r.Path
+		}
 
 		httpRequestsTotal.WithLabelValues(c.Method(), routePath, status).Inc()
 		httpRequestDuration.WithLabelValues(c.Method(), routePath).Observe(duration)
