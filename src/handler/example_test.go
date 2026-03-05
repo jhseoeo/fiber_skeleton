@@ -97,8 +97,16 @@ func TestCreateExample_Success(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	res, err := app.Test(req, fiber.TestConfig{Timeout: testTimeout})
 	require.NoError(t, err)
+	require.Equal(t, http.StatusCreated, res.StatusCode)
 
-	assert.Equal(t, http.StatusCreated, res.StatusCode)
+	var buf bytes.Buffer
+	_, _ = buf.ReadFrom(res.Body)
+	r := decodeResp(t, &buf)
+	assert.Equal(t, errorcode.Success, r.Code)
+	data, ok := r.Data.(map[string]any)
+	require.True(t, ok)
+	assert.Equal(t, float64(1), data["id"])
+	assert.Equal(t, "hello", data["content"])
 }
 
 func TestCreateExample_InvalidBody(t *testing.T) {
