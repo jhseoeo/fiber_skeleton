@@ -9,6 +9,7 @@ package main
 import (
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -108,7 +109,11 @@ func buildCORS(cfg *config.Config) fiber.Handler {
 		}
 		return middleware.NewCORS()
 	}
-	return middleware.NewCORS(cors.Config{AllowOrigins: []string{cfg.CORSAllowOrigins}})
+	origins := strings.Split(cfg.CORSAllowOrigins, ",")
+	for i, o := range origins {
+		origins[i] = strings.TrimSpace(o)
+	}
+	return middleware.NewCORS(cors.Config{AllowOrigins: origins})
 }
 
 func registerSwagger(app *fiber.App) {
