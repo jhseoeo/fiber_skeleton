@@ -41,8 +41,13 @@ func Load() *Config {
 }
 
 func (c *Config) validate() error {
-	if c.Env == "production" && c.JWTSecret == defaultJWTSecret {
-		return fmt.Errorf("JWT_SECRET must be changed from the default value in production")
+	if c.Env == "production" {
+		if c.JWTSecret == defaultJWTSecret {
+			return fmt.Errorf("JWT_SECRET must be changed from the default value in production")
+		}
+		if len(c.JWTSecret) < 32 {
+			return fmt.Errorf("JWT_SECRET must be at least 32 bytes for adequate HMAC security (got %d)", len(c.JWTSecret))
+		}
 	}
 	return nil
 }
