@@ -223,10 +223,10 @@ func bindJSON(c fiber.Ctx, dst any) error {
 // Returns a ready-to-return ErrorResp on failure, or nil on success.
 func bindQuery(c fiber.Ctx, dst any) error {
 	if err := c.Bind().Query(dst); err != nil {
-		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, "invalid query parameters")
+		return typeerr.NewErrorResp(err, errorcode.ErrBadRequest, "invalid query parameters")
 	}
 	if err := validate.Struct(dst); err != nil {
-		return typeerr.NewErrorRespWithData(err, errorcode.ErrInvalidBody, "validation failed", err)
+		return typeerr.NewErrorRespWithData(err, errorcode.ErrBadRequest, "validation failed", err)
 	}
 	return nil
 }
