@@ -74,7 +74,8 @@ func (r *ExampleRepository) Create(ctx context.Context, example *model.Example) 
 	defer r.mu.Unlock()
 	example.ID = r.nextID
 	r.nextID++
-	r.examples[example.ID] = example
+	cp := *example
+	r.examples[example.ID] = &cp
 	return nil
 }
 
@@ -84,7 +85,8 @@ func (r *ExampleRepository) Update(ctx context.Context, example *model.Example) 
 	if _, ok := r.examples[example.ID]; !ok {
 		return repositoryerror.ErrNotFound.New(fmt.Sprintf("example %d", example.ID))
 	}
-	r.examples[example.ID] = example
+	cp := *example
+	r.examples[example.ID] = &cp
 	return nil
 }
 
