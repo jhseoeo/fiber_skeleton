@@ -5,6 +5,3 @@ type GetExampleResp struct {
 	Content string `json:"content"`
 }
 
-type CreateExampleResp struct {
-	ID uint `json:"id"`
-}

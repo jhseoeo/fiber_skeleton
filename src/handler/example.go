@@ -130,8 +130,9 @@ func (h *ExampleHandler) create(c fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusCreated).JSON(resp.CommonResp{
 		Code: errorcode.Success,
-		Data: resp.CreateExampleResp{
-			ID: example.ID,
+		Data: resp.GetExampleResp{
+			ID:      example.ID,
+			Content: example.Content,
 		},
 	})
 }
