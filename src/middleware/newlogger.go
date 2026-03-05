@@ -23,12 +23,21 @@ func NewLogger() fiber.Handler {
 			return err
 		}
 
-		log.NewFiberLogEntry(c).WithFields(logrus.Fields{
+		entry := log.NewFiberLogEntry(c).WithFields(logrus.Fields{
 			"status":     status,
 			"latency_ms": time.Since(start).Milliseconds(),
 			"bytes_sent": len(c.Response().Body()),
 			"ip":         c.IP(),
-		}).Info("request")
+		})
+		// 2xx → Debug (high-volume, low-value in production)
+		// 3xx → Info
+		// others logged by the error handler; skip here
+		switch {
+		case status < 300:
+			entry.Debug("request")
+		default:
+			entry.Info("request")
+		}
 
 		return err
 	}
