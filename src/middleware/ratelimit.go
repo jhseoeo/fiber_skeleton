@@ -12,7 +12,7 @@ import (
 func NewRateLimiter(cfg limiter.Config) fiber.Handler {
 	cfg.LimitReached = func(c fiber.Ctx) error {
 		return c.Status(fiber.StatusTooManyRequests).JSON(resp.CommonResp{
-			Code:    errorcode.ErrorCode(fiber.StatusTooManyRequests * 100),
+			Code:    errorcode.ErrTooManyRequests,
 			Message: "too many requests",
 		})
 	}

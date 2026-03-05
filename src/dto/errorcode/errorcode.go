@@ -24,6 +24,9 @@ const (
 	// 409xx - Conflict
 	ErrConflict ErrorCode = 40900
 
+	// 429xx - Too Many Requests
+	ErrTooManyRequests ErrorCode = 42900
+
 	// 500xx - Internal Server Error
 	ErrInternalServer ErrorCode = 50000
 )
