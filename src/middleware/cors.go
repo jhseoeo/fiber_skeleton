@@ -9,9 +9,15 @@ import (
 // Override AllowOrigins in production to restrict to trusted domains, e.g.:
 //
 //	middleware.NewCORS(cors.Config{AllowOrigins: []string{"https://example.com"}})
+//
+// MaxAge defaults to 3600 seconds (1 hour) to reduce preflight requests.
 func NewCORS(cfgs ...cors.Config) fiber.Handler {
+	cfg := cors.Config{MaxAge: 3600}
 	if len(cfgs) > 0 {
-		return cors.New(cfgs[0])
+		cfg = cfgs[0]
+		if cfg.MaxAge == 0 {
+			cfg.MaxAge = 3600
+		}
 	}
-	return cors.New()
+	return cors.New(cfg)
 }
