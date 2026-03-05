@@ -1,6 +1,10 @@
 package handler
 
-import "github.com/gofiber/fiber/v3"
+import (
+	"github.com/gofiber/fiber/v3"
+	"github.com/jhseoeo/fiber-skeleton/src/dto/errorcode"
+	"github.com/jhseoeo/fiber-skeleton/src/dto/resp"
+)
 
 // Liveness godoc
 //
@@ -28,4 +32,13 @@ func Liveness(c fiber.Ctx) error {
 func Readiness(c fiber.Ctx) error {
 	// TODO: check external dependencies (DB, cache, etc.) and return 503 if unavailable.
 	return c.SendStatus(fiber.StatusOK)
+}
+
+// NotFound is a catch-all handler that returns a JSON 404 in the CommonResp
+// format for any unregistered route.
+func NotFound(c fiber.Ctx) error {
+	return c.Status(fiber.StatusNotFound).JSON(resp.CommonResp{
+		Code:    errorcode.ErrorCode(fiber.StatusNotFound * 100),
+		Message: "route not found",
+	})
 }

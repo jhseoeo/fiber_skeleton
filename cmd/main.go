@@ -71,6 +71,9 @@ func main() {
 	//   api := app.Group("/api", middleware.NewRateLimiter(limiter.Config{Max: 100, Expiration: time.Minute}))
 	//   exampleHandler.RegisterRoutes(api)
 
+	// Catch-all: return a JSON 404 for unregistered routes.
+	app.Use(handler.NotFound)
+
 	quit := make(chan struct{})
 	go func() {
 		sig := make(chan os.Signal, 1)
