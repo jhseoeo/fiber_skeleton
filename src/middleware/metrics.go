@@ -35,8 +35,12 @@ func NewMetrics(app *fiber.App) fiber.Handler {
 		duration := time.Since(start).Seconds()
 		status := strconv.Itoa(c.Response().StatusCode())
 
-		httpRequestsTotal.WithLabelValues(c.Method(), c.Path(), status).Inc()
-		httpRequestDuration.WithLabelValues(c.Method(), c.Path()).Observe(duration)
+		// Use the route pattern (e.g. /example/:id) instead of the actual path
+		// to avoid label cardinality explosion in Prometheus.
+		routePath := c.Route().Path
+
+		httpRequestsTotal.WithLabelValues(c.Method(), routePath, status).Inc()
+		httpRequestDuration.WithLabelValues(c.Method(), routePath).Observe(duration)
 
 		return err
 	}
