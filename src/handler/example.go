@@ -47,11 +47,8 @@ func (h *ExampleHandler) RegisterRoutes(router fiber.Router) {
 //	@Router			/example [get]
 func (h *ExampleHandler) list(c fiber.Ctx) error {
 	var query req.PaginationReq
-	if err := c.Bind().Query(&query); err != nil {
-		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, "invalid query parameters")
-	}
-	if err := validate.Struct(&query); err != nil {
-		return typeerr.NewErrorRespWithData(err, errorcode.ErrInvalidBody, "validation failed", err)
+	if err := bindQuery(c, &query); err != nil {
+		return err
 	}
 	examples, total, err := h.exampleService.ListExamples(c.Context(), query.Page, query.Limit)
 	if err != nil {
@@ -121,11 +118,8 @@ func (h *ExampleHandler) get(c fiber.Ctx) error {
 //	@Router			/example [post]
 func (h *ExampleHandler) create(c fiber.Ctx) error {
 	var body req.CreateExampleReq
-	if err := c.Bind().JSON(&body); err != nil {
-		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, "invalid request body")
-	}
-	if err := validate.Struct(&body); err != nil {
-		return typeerr.NewErrorRespWithData(err, errorcode.ErrInvalidBody, "validation failed", err)
+	if err := bindJSON(c, &body); err != nil {
+		return err
 	}
 	example := &model.Example{Content: body.Content}
 	if err := h.exampleService.CreateExample(c.Context(), example); err != nil {
@@ -162,11 +156,8 @@ func (h *ExampleHandler) update(c fiber.Ctx) error {
 		return typeerr.NewErrorResp(err, errorcode.ErrInvalidID, "invalid id")
 	}
 	var body req.UpdateExampleReq
-	if err := c.Bind().JSON(&body); err != nil {
-		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, "invalid request body")
-	}
-	if err := validate.Struct(&body); err != nil {
-		return typeerr.NewErrorRespWithData(err, errorcode.ErrInvalidBody, "validation failed", err)
+	if err := bindJSON(c, &body); err != nil {
+		return err
 	}
 	example := &model.Example{ID: idUint, Content: body.Content}
 	if err := h.exampleService.UpdateExample(c.Context(), example); err != nil {
@@ -213,4 +204,28 @@ func (h *ExampleHandler) delete(c fiber.Ctx) error {
 func parseID(c fiber.Ctx) (uint, error) {
 	id, err := strconv.ParseUint(c.Params("id"), 10, 64)
 	return uint(id), err
+}
+
+// bindJSON binds a JSON request body into dst and validates it.
+// Returns a ready-to-return ErrorResp on failure, or nil on success.
+func bindJSON(c fiber.Ctx, dst any) error {
+	if err := c.Bind().JSON(dst); err != nil {
+		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, "invalid request body")
+	}
+	if err := validate.Struct(dst); err != nil {
+		return typeerr.NewErrorRespWithData(err, errorcode.ErrInvalidBody, "validation failed", err)
+	}
+	return nil
+}
+
+// bindQuery binds query parameters into dst and validates them.
+// Returns a ready-to-return ErrorResp on failure, or nil on success.
+func bindQuery(c fiber.Ctx, dst any) error {
+	if err := c.Bind().Query(dst); err != nil {
+		return typeerr.NewErrorResp(err, errorcode.ErrInvalidBody, "invalid query parameters")
+	}
+	if err := validate.Struct(dst); err != nil {
+		return typeerr.NewErrorRespWithData(err, errorcode.ErrInvalidBody, "validation failed", err)
+	}
+	return nil
 }
