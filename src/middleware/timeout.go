@@ -26,7 +26,7 @@ func NewTimeout(d time.Duration) fiber.Handler {
 		c.SetContext(ctx)
 
 		err := c.Next()
-		if err != nil && ctx.Err() == context.DeadlineExceeded {
+		if ctx.Err() == context.DeadlineExceeded {
 			return typeerr.NewErrorResp(ctx.Err(), errorcode.ErrRequestTimeout, "request timeout")
 		}
 		return err
