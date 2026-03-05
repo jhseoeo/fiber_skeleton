@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -55,9 +56,12 @@ func getEnv(key, defaultVal string) string {
 
 func parseDuration(key string, defaultVal time.Duration) time.Duration {
 	if v := os.Getenv(key); v != "" {
-		if d, err := time.ParseDuration(v); err == nil {
-			return d
+		d, err := time.ParseDuration(v)
+		if err != nil {
+			log.Printf("WARN: invalid value for %s (%q): %v; using default %s", key, v, err, defaultVal)
+			return defaultVal
 		}
+		return d
 	}
 	return defaultVal
 }
