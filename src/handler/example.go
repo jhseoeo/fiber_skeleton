@@ -62,11 +62,14 @@ func (h *ExampleHandler) list(c fiber.Ctx) error {
 	for _, e := range examples {
 		items = append(items, resp.GetExampleResp{ID: e.ID, Content: e.Content})
 	}
-	return c.JSON(resp.PaginatedResp{
-		Total: total,
-		Page:  query.Page,
-		Limit: query.Limit,
-		Data:  items,
+	return c.JSON(resp.CommonResp{
+		Code: errorcode.Success,
+		Data: resp.PaginatedResp{
+			Total: total,
+			Page:  query.Page,
+			Limit: query.Limit,
+			Data:  items,
+		},
 	})
 }
 
