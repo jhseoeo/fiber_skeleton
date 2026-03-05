@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/pprof"
 	fiberrequestid "github.com/gofiber/fiber/v3/middleware/requestid"
 	"github.com/jhseoeo/fiber-skeleton/src/config"
@@ -39,7 +40,7 @@ func main() {
 
 	app.Use(middleware.NewRecoverer())
 	app.Use(middleware.NewMetrics(app))
-	app.Use(middleware.NewCORS())
+	app.Use(buildCORS(cfg))
 	app.Use(middleware.NewSecurity())
 	app.Use(middleware.NewTimeout(cfg.RequestTimeout))
 	app.Use(middleware.NewLogger())
@@ -98,6 +99,16 @@ func main() {
 		logrus.WithError(err).Fatal("failed to start server")
 	}
 	<-quit
+}
+
+func buildCORS(cfg *config.Config) fiber.Handler {
+	if cfg.CORSAllowOrigins == "" {
+		if cfg.Env == "production" {
+			logrus.Warn("CORS_ALLOW_ORIGINS is not set; allowing all origins in production is insecure")
+		}
+		return middleware.NewCORS()
+	}
+	return middleware.NewCORS(cors.Config{AllowOrigins: []string{cfg.CORSAllowOrigins}})
 }
 
 func registerSwagger(app *fiber.App) {

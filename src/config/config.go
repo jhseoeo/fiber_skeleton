@@ -11,11 +11,12 @@ import (
 const defaultJWTSecret = "change-me-in-production"
 
 type Config struct {
-	Port           string
-	Env            string
-	LogLevel       string
-	RequestTimeout time.Duration
-	JWTSecret      string
+	Port             string
+	Env              string
+	LogLevel         string
+	RequestTimeout   time.Duration
+	JWTSecret        string
+	CORSAllowOrigins string // comma-separated; empty means allow all origins
 }
 
 func Load() *Config {
@@ -23,11 +24,12 @@ func Load() *Config {
 	_ = godotenv.Load()
 
 	cfg := &Config{
-		Port:           getEnv("PORT", "3000"),
-		Env:            getEnv("ENV", "development"),
-		LogLevel:       getEnv("LOG_LEVEL", "info"),
-		RequestTimeout: parseDuration("REQUEST_TIMEOUT", 30*time.Second),
-		JWTSecret:      getEnv("JWT_SECRET", defaultJWTSecret),
+		Port:             getEnv("PORT", "3000"),
+		Env:              getEnv("ENV", "development"),
+		LogLevel:         getEnv("LOG_LEVEL", "info"),
+		RequestTimeout:   parseDuration("REQUEST_TIMEOUT", 30*time.Second),
+		JWTSecret:        getEnv("JWT_SECRET", defaultJWTSecret),
+		CORSAllowOrigins: getEnv("CORS_ALLOW_ORIGINS", ""),
 	}
 
 	if err := cfg.validate(); err != nil {
