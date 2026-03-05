@@ -38,7 +38,7 @@ func Readiness(c fiber.Ctx) error {
 // format for any unregistered route.
 func NotFound(c fiber.Ctx) error {
 	return c.Status(fiber.StatusNotFound).JSON(resp.CommonResp{
-		Code:    errorcode.ErrorCode(fiber.StatusNotFound * 100),
+		Code:    errorcode.ErrNotFound,
 		Message: "route not found",
 	})
 }
