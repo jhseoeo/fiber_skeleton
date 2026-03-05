@@ -63,7 +63,8 @@ func (r *ExampleRepository) FindByID(ctx context.Context, id uint) (*model.Examp
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	if example, ok := r.examples[id]; ok {
-		return example, nil
+		cp := *example
+		return &cp, nil
 	}
 	return nil, repositoryerror.ErrNotFound.New(fmt.Sprintf("example %d", id))
 }
