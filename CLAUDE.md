@@ -104,7 +104,7 @@ var _ serviceport.ExampleServicePort = (*ExampleService)(nil)
 
 - **Mock types** live in `src/testutil/` — `MockExampleService` and `MockExampleRepository` with function fields per method. Nil function fields panic with a descriptive message.
 - **Service tests** (`src/service/*_test.go`): inject `MockExampleRepository`, no HTTP.
-- **Handler unit tests** (`src/handler/example_test.go`): inject `MockExampleService` via `newTestApp()`.
+- **Handler unit tests** (`src/handler/example_test.go`): inject `MockExampleService` via `newTestApp()`. Covers all endpoints including List.
 - **Handler integration tests** (`src/handler/example_integration_test.go`): wire real `ExampleRepository` + `ExampleService` through `newIntegrationApp()`. Each test creates an isolated app instance.
 - All `app.Test` calls use `fiber.TestConfig{Timeout: 5 * time.Second}`.
 
@@ -123,7 +123,7 @@ var _ serviceport.ExampleServicePort = (*ExampleService)(nil)
 `Recoverer → Metrics → CORS → Security (helmet) → Timeout → RequestID → Logger`
 
 - **Metrics** (`NewMetrics(app)`) registers Prometheus counter/histogram and `GET /metrics`. Uses `c.Route().Path` (with nil guard) to avoid label cardinality explosion.
-- **CORS** (`NewCORS()`) defaults to allow-all with `MaxAge=3600`. `CORS_ALLOW_ORIGINS` env var accepts comma-separated origins.
+- **CORS** (`NewCORS()`) defaults to allow-all with `MaxAge=3600`. `CORS_ALLOW_ORIGINS` env var accepts comma-separated origins. Empty entries from trailing/consecutive commas are filtered out.
 - **RateLimiter** (`NewRateLimiter(limiter.Config{...})`) is not wired by default — apply to specific route groups.
 - **Timeout** returns 408 when `context.DeadlineExceeded`, regardless of handler return value.
 
