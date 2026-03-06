@@ -110,9 +110,18 @@ func buildCORS(cfg *config.Config) fiber.Handler {
 		}
 		return middleware.NewCORS()
 	}
-	origins := strings.Split(cfg.CORSAllowOrigins, ",")
-	for i, o := range origins {
-		origins[i] = strings.TrimSpace(o)
+	var origins []string
+	for _, o := range strings.Split(cfg.CORSAllowOrigins, ",") {
+		o = strings.TrimSpace(o)
+		if o != "" {
+			origins = append(origins, o)
+		}
+	}
+	if len(origins) == 0 {
+		if cfg.Env == "production" {
+			logrus.Warn("CORS_ALLOW_ORIGINS resolved to empty after parsing; allowing all origins in production is insecure")
+		}
+		return middleware.NewCORS()
 	}
 	return middleware.NewCORS(cors.Config{AllowOrigins: origins})
 }
