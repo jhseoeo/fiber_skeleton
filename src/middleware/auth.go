@@ -19,7 +19,10 @@ type Claims struct {
 	// Role   string `json:"role"`
 }
 
-const claimsKey = "claims"
+const (
+	claimsKey    = "claims"
+	bearerScheme = "Bearer "
+)
 
 // NewAuthMiddleware returns a JWT authentication middleware.
 // It validates the Bearer token from the Authorization header and
@@ -29,7 +32,7 @@ const claimsKey = "claims"
 func NewAuthMiddleware(jwtSecret []byte) fiber.Handler {
 	return func(c fiber.Ctx) error {
 		authHeader := c.Get(fiber.HeaderAuthorization)
-		if !strings.HasPrefix(authHeader, "Bearer ") {
+		if !strings.HasPrefix(authHeader, bearerScheme) {
 			return typeerr.NewErrorResp(
 				fmt.Errorf("missing authorization header"),
 				errorcode.ErrUnauthorized,
@@ -37,7 +40,7 @@ func NewAuthMiddleware(jwtSecret []byte) fiber.Handler {
 			)
 		}
 
-		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+		tokenStr := strings.TrimPrefix(authHeader, bearerScheme)
 
 		token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(t *jwt.Token) (any, error) {
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
