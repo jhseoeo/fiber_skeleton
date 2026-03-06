@@ -105,7 +105,7 @@ var _ serviceport.ExampleServicePort = (*ExampleService)(nil)
 - **Mock types** live in `src/testutil/` — `MockExampleService` and `MockExampleRepository` with function fields per method. Nil function fields panic with a descriptive message.
 - **Service tests** (`src/service/*_test.go`): inject `MockExampleRepository`, no HTTP.
 - **Handler unit tests** (`src/handler/example_test.go`): inject `MockExampleService` via `newTestApp()`. Covers all endpoints including List.
-- **Handler integration tests** (`src/handler/example_integration_test.go`): wire real `ExampleRepository` + `ExampleService` through `newIntegrationApp()`. Each test creates an isolated app instance.
+- **Handler integration tests** (`src/handler/example_integration_test.go`): wire real `ExampleRepository` + `ExampleService` through `newIntegrationApp()`. Each test creates an isolated app instance. Includes max-boundary pagination tests (page=10000, page=10001).
 - All `app.Test` calls use `fiber.TestConfig{Timeout: 5 * time.Second}`.
 
 ### Validation
@@ -113,6 +113,10 @@ var _ serviceport.ExampleServicePort = (*ExampleService)(nil)
 - `validate.Struct()` returns `validate.FieldErrors` (a `[]FieldError{Field, Message}`) on failure.
 - In handlers, use `typeerr.NewErrorRespWithData(err, code, message, err)` to include the structured list in the response `data` field.
 - Request DTOs enforce upper bounds (e.g., `Page max=10000`, `Limit max=100`, `Content max=10000`).
+
+### Request ID key
+
+`pkg/log` reads the request ID from Fiber locals via `log.RequestIDKey` (`"requestid"`), which matches the default key used by `github.com/gofiber/fiber/v3/middleware/requestid`. If you change the requestid middleware's `LocalsKey`, update `RequestIDKey` accordingly.
 
 ### JWT auth
 
