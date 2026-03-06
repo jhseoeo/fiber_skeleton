@@ -1,4 +1,4 @@
-package testutil
+package servicemock
 
 import (
 	"context"
