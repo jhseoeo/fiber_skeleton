@@ -154,6 +154,35 @@ func TestIntegration_ListInvalidQuery(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
 }
 
+func TestIntegration_ListMaxPageBoundary(t *testing.T) {
+	app := newIntegrationApp()
+
+	// page=10000 (max allowed) with no items → 200 with empty list, not a crash
+	req := httptest.NewRequest(http.MethodGet, "/example?page=10000&limit=100", nil)
+	res, err := app.Test(req, fiber.TestConfig{Timeout: testTimeout})
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, res.StatusCode)
+
+	var buf bytes.Buffer
+	_, _ = buf.ReadFrom(res.Body)
+	var r map[string]any
+	require.NoError(t, json.NewDecoder(&buf).Decode(&r))
+	data, _ := r["data"].(map[string]any)
+	assert.Equal(t, float64(0), data["total"])
+	items, _ := data["data"].([]any)
+	assert.Empty(t, items)
+}
+
+func TestIntegration_ListExceedMaxPage(t *testing.T) {
+	app := newIntegrationApp()
+
+	// page=10001 (exceeds max=10000) → 400
+	req := httptest.NewRequest(http.MethodGet, "/example?page=10001&limit=10", nil)
+	res, err := app.Test(req, fiber.TestConfig{Timeout: testTimeout})
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+}
+
 func TestIntegration_DeleteAndNotFound(t *testing.T) {
 	app := newIntegrationApp()
 
