@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -36,6 +37,61 @@ func decodeResp(t *testing.T, body *bytes.Buffer) resp.CommonResp {
 	var r resp.CommonResp
 	require.NoError(t, json.NewDecoder(body).Decode(&r))
 	return r
+}
+
+// --- GET /example ---
+
+func TestListExample_Success(t *testing.T) {
+	app := newTestApp(&testutil.MockExampleService{
+		ListExamplesFn: func(_ context.Context, page, limit int) ([]*model.Example, int, error) {
+			return []*model.Example{
+				{ID: 1, Content: "first"},
+				{ID: 2, Content: "second"},
+			}, 5, nil
+		},
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/example?page=1&limit=2", nil)
+	res, err := app.Test(req, fiber.TestConfig{Timeout: testTimeout})
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+
+	var buf bytes.Buffer
+	_, _ = buf.ReadFrom(res.Body)
+	r := decodeResp(t, &buf)
+	assert.Equal(t, errorcode.Success, r.Code)
+
+	data, ok := r.Data.(map[string]any)
+	require.True(t, ok)
+	assert.Equal(t, float64(5), data["total"])
+	assert.Equal(t, float64(1), data["page"])
+	assert.Equal(t, float64(2), data["limit"])
+
+	items, ok := data["data"].([]any)
+	require.True(t, ok)
+	assert.Len(t, items, 2)
+}
+
+func TestListExample_InvalidQuery(t *testing.T) {
+	app := newTestApp(&testutil.MockExampleService{})
+
+	req := httptest.NewRequest(http.MethodGet, "/example?page=0&limit=10", nil)
+	res, err := app.Test(req, fiber.TestConfig{Timeout: testTimeout})
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+}
+
+func TestListExample_ServiceError(t *testing.T) {
+	app := newTestApp(&testutil.MockExampleService{
+		ListExamplesFn: func(_ context.Context, page, limit int) ([]*model.Example, int, error) {
+			return nil, 0, errors.New("db error")
+		},
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/example?page=1&limit=10", nil)
+	res, err := app.Test(req, fiber.TestConfig{Timeout: testTimeout})
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
 }
 
 // --- GET /example/:id ---
