@@ -59,7 +59,7 @@ func (r *ExampleRepository) List(_ context.Context, offset, limit int) ([]*model
 	return result, total, nil
 }
 
-func (r *ExampleRepository) FindByID(ctx context.Context, id uint) (*model.Example, error) {
+func (r *ExampleRepository) FindByID(_ context.Context, id uint) (*model.Example, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	if example, ok := r.examples[id]; ok {
@@ -69,7 +69,7 @@ func (r *ExampleRepository) FindByID(ctx context.Context, id uint) (*model.Examp
 	return nil, repositoryerror.ErrNotFound.New(fmt.Sprintf("example %d", id))
 }
 
-func (r *ExampleRepository) Create(ctx context.Context, example *model.Example) error {
+func (r *ExampleRepository) Create(_ context.Context, example *model.Example) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	example.ID = r.nextID
@@ -79,7 +79,7 @@ func (r *ExampleRepository) Create(ctx context.Context, example *model.Example) 
 	return nil
 }
 
-func (r *ExampleRepository) Update(ctx context.Context, example *model.Example) error {
+func (r *ExampleRepository) Update(_ context.Context, example *model.Example) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if _, ok := r.examples[example.ID]; !ok {
@@ -90,7 +90,7 @@ func (r *ExampleRepository) Update(ctx context.Context, example *model.Example) 
 	return nil
 }
 
-func (r *ExampleRepository) Delete(ctx context.Context, id uint) error {
+func (r *ExampleRepository) Delete(_ context.Context, id uint) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if _, ok := r.examples[id]; !ok {
