@@ -21,12 +21,15 @@ func Init(cfg *config.Config) {
 	}
 }
 
+// RequestIDKey is the locals key used by the Fiber requestid middleware.
+const RequestIDKey = "requestid"
+
 func NewFiberLogEntry(c fiber.Ctx) *logrus.Entry {
 	fields := logrus.Fields{
 		"method": c.Method(),
 		"path":   c.Path(),
 	}
-	if requestID := c.Locals("requestid"); requestID != nil {
+	if requestID := c.Locals(RequestIDKey); requestID != nil {
 		fields["request_id"] = requestID
 	}
 	return logrus.WithFields(fields)
