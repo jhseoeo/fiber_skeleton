@@ -8,12 +8,13 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/jhseoeo/fiber-skeleton/src/handler"
 	"github.com/jhseoeo/fiber-skeleton/src/middleware"
 	"github.com/jhseoeo/fiber-skeleton/src/repository"
 	"github.com/jhseoeo/fiber-skeleton/src/service"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 // newIntegrationApp wires the real in-memory repository and service so the

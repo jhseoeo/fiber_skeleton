@@ -4,8 +4,9 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/jhseoeo/fiber-skeleton/src/pkg/log"
 	"github.com/sirupsen/logrus"
+
+	"github.com/jhseoeo/fiber-skeleton/src/pkg/log"
 )
 
 func NewLogger() fiber.Handler {

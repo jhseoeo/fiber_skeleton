@@ -4,11 +4,12 @@ import (
 	"errors"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/sirupsen/logrus"
+
 	"github.com/jhseoeo/fiber-skeleton/src/dto/errorcode"
 	"github.com/jhseoeo/fiber-skeleton/src/dto/resp"
 	"github.com/jhseoeo/fiber-skeleton/src/pkg/log"
 	"github.com/jhseoeo/fiber-skeleton/src/pkg/typeerr"
-	"github.com/sirupsen/logrus"
 )
 
 func NewErrorHandler() fiber.ErrorHandler {

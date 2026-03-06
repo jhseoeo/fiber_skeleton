@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/jhseoeo/fiber-skeleton/src/dto/errorcode"
 	"github.com/jhseoeo/fiber-skeleton/src/pkg/typeerr"
 )

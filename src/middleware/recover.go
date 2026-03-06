@@ -3,8 +3,9 @@ package middleware
 import (
 	"github.com/gofiber/fiber/v3"
 	fiberRecoverer "github.com/gofiber/fiber/v3/middleware/recover"
-	"github.com/jhseoeo/fiber-skeleton/src/pkg/log"
 	"github.com/sirupsen/logrus"
+
+	"github.com/jhseoeo/fiber-skeleton/src/pkg/log"
 )
 
 func NewRecoverer() fiber.Handler {

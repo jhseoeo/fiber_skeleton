@@ -10,6 +10,9 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/jhseoeo/fiber-skeleton/src/dto/errorcode"
 	"github.com/jhseoeo/fiber-skeleton/src/dto/resp"
 	"github.com/jhseoeo/fiber-skeleton/src/handler"
@@ -17,8 +20,6 @@ import (
 	"github.com/jhseoeo/fiber-skeleton/src/model"
 	repositoryerror "github.com/jhseoeo/fiber-skeleton/src/repository/error"
 	"github.com/jhseoeo/fiber-skeleton/src/testutil"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 const testTimeout = 5 * time.Second

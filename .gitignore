@@ -26,4 +26,4 @@ Thumbs.db
 vendor/
 
 # claude
-.claude/
+.claude/*.local.json

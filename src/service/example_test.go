@@ -5,11 +5,12 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/jhseoeo/fiber-skeleton/src/model"
 	repositoryerror "github.com/jhseoeo/fiber-skeleton/src/repository/error"
 	"github.com/jhseoeo/fiber-skeleton/src/service"
 	"github.com/jhseoeo/fiber-skeleton/src/testutil"
-	"github.com/stretchr/testify/assert"
 )
 
 // --- GetExample ---

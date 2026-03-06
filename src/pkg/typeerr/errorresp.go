@@ -2,6 +2,7 @@ package typeerr
 
 import (
 	"github.com/go-errors/errors"
+
 	"github.com/jhseoeo/fiber-skeleton/src/dto/errorcode"
 )
 

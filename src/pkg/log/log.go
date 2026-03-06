@@ -2,8 +2,9 @@ package log
 
 import (
 	"github.com/gofiber/fiber/v3"
-	"github.com/jhseoeo/fiber-skeleton/src/config"
 	"github.com/sirupsen/logrus"
+
+	"github.com/jhseoeo/fiber-skeleton/src/config"
 )
 
 func Init(cfg *config.Config) {

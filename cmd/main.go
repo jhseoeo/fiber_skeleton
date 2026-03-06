@@ -17,15 +17,16 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/pprof"
 	fiberrequestid "github.com/gofiber/fiber/v3/middleware/requestid"
-	"github.com/jhseoeo/fiber-skeleton/src/config"
+	"github.com/sirupsen/logrus"
+	"github.com/swaggo/swag"
+
 	_ "github.com/jhseoeo/fiber-skeleton/docs"
+	"github.com/jhseoeo/fiber-skeleton/src/config"
 	"github.com/jhseoeo/fiber-skeleton/src/handler"
 	"github.com/jhseoeo/fiber-skeleton/src/middleware"
 	pkglog "github.com/jhseoeo/fiber-skeleton/src/pkg/log"
 	"github.com/jhseoeo/fiber-skeleton/src/repository"
 	"github.com/jhseoeo/fiber-skeleton/src/service"
-	"github.com/sirupsen/logrus"
-	"github.com/swaggo/swag"
 )
 
 const shutdownTimeout = 10 * time.Second
